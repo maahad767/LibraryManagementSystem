@@ -62,3 +62,13 @@ class BookBorrowRecord(models.Model):
     def __str__(self):
         return f'{self.copy.book} borrowed by {self.borrower}'
 
+
+class BookSaleRecord(models.Model):
+    copy = models.ForeignKey(Copy, on_delete=models.CASCADE, related_name='sold')
+    customer = models.CharField(max_length=256)
+    sale_date = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f'{self.copy.book} sold to {self.customer} at {self.sale_date}'
+
+
