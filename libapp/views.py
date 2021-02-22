@@ -20,13 +20,11 @@ class MainView(View):
 class BooksListView(View):
     def get(self, request):
         books = Book.objects.all()
-        print(request.GET)
-
-        book_filter = BookFilter(request.GET, queryset=books)
+        
+        book_filter = BookFilter(request.GET, queryset=books.order_by('id'))
         filtered_books = book_filter.qs
-        print(filtered_books)
 
-        paginator = Paginator(filtered_books, 2) 
+        paginator = Paginator(filtered_books, 20) 
 
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)

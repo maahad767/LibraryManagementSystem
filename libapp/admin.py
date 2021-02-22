@@ -30,9 +30,13 @@ class BookSaleAdmin(admin.ModelAdmin):
     pass
 
 
+class BookBorrowAdmin(admin.ModelAdmin):
+    pass
+
+
 admin.site.register(models.Category, CategoryAdmin)
 admin.site.register(models.Author, AuthorAdmin)
 admin.site.register(models.Publisher, PublisherAdmin)
 admin.site.register(models.Book, BookAdmin)
 admin.site.register(models.BookSaleRecord, BookSaleAdmin)
-
+admin.site.register(models.BookBorrowRecord, BookBorrowAdmin)

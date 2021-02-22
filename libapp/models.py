@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-
+from datetime import datetime
+from django.db.models.signals import post_save, pre_delete
 
 class Author(models.Model):
     name = models.CharField(max_length=256)
@@ -42,6 +43,7 @@ class Copy(models.Model):
     STATUS = [
         ('available', 'available'),
         ('borrowed', 'borrowed'),
+        ('sold', 'sold'),
     ]
     status = models.CharField(max_length=50, choices=STATUS)
 
@@ -69,6 +71,28 @@ class BookSaleRecord(models.Model):
     sale_date = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f'{self.copy.book} sold to {self.customer} at {self.sale_date}'
+        return f'{self.copy.book} sold to {self.customer} at {self.sale_date.date()}'
 
 
+
+def book_sold_status_update(sender, instance, **kwargs):
+    instance.copy.status = 'sold'
+    instance.copy.save()
+
+
+def book_borrow_status_update(sender, instance, **kwargs):
+    if instance.return_date:
+        instance.copy.status = 'available'
+    else:
+        instance.copy.status = 'borrowed'
+    instance.copy.save()
+
+
+def book_records_delete(sender, instance, **kwargs):
+    instance.copy.status = 'available'
+    instance.copy.save()
+
+
+post_save.connect(book_sold_status_update, sender=BookSaleRecord)
+post_save.connect(book_borrow_status_update, sender=BookBorrowRecord)
+pre_delete.connect(book_records_delete, sender=BookSaleRecord)
